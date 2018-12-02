@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script src="lib/vue.min.js"></script>
+    <script src="lib/lodash.min.js"></script>
+
+    <script src="js/script.js"></script>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>Gestionnaire restaurants VueJS</title>
+  
+</head>
+
+<body>  
+    <p class="P1">Bienvenue dans la gestion des restaurants.</p>
+<div id="app">
+    <form v-on:submit="ajouterRestaurant" class="Add">
+            <p class="AddTxt">   Ajouter un restaurant : </p>
+        <br/>
+        
+       <label>
+            Nom : <input type="text" required v-model="name">
+        </label>
+        <label>
+            Cuisine : <input type="text" required v-model="cuisine">
+        </label>
+
+        <button>Ajouter</button>
+    </form>
+
+
+    <div class="Search">
+     <p class="SearchTxt">Rechercher :</p>   
+        <br/>
+       
+        <label>Recherchez un restaurant par son nom :
+            <input v-on:input="searchRestaurantsFromServer" type="text" v-model="nomRecherche" required v-model="name">
+            
+        </label>
+    </div>
+
+    <p>
+        Nombre de restaurants par page : 
+        <input type="range" min=5 max=100 value=10
+                v-on:input="changePageSize" 
+                v-model="nbRestaurantsParPage"
+        >
+        {{nbRestaurantsParPage}}
+    </p>
+
+
+    <h1>Nombre de restaurants : {{nbRestaurants}}</h1>
+    <form v-on:submit="supprimerRestaurant">
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>Cuisine </th>
+        </tr>
+        <tbody>
+            <tr id="dataTable" v-for="r,index in restaurants" v-bind:style="{backgroundColor:getColor(index)}"
+                v-bind:class="{bordureRouge:(index === 2)}">
+                <td style="display:none;">{{r.id}}</td>
+                <td>{{r.name}}</td>
+                <td> {{r.cuisine}}</td>
+                <td><button>Supprimer</button></td></form>
+                <td><button v-on:click="PreModifier(index)">Modifier</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <input type="button" id="PremPage" v-on:click="premierePage" value="Première page"></input>
+    <input type="button" id="PagePrec" v-on:click="pagePrecedente" value="Page précédente"></input>
+    <input type="button" id="PageSuiv" v-on:click="pageSuivante" value="Page suivante"></input>
+    <input type="button" id="DernPage" v-on:click="dernierePage" value="Dernière page"></input>
+
+    <form v-on:submit="modifierRestaurant" class="Mod">
+        <p class="AddTxt">   Modifier un restaurant : </p>
+    <br/>
+    <label style="display:none;">
+        ID : <input type="text" required v-model="id" name="_id">
+    </label>
+   <label>
+        Nom : <input type="text" required v-model="name" name="NomMod">
+    </label>
+    <label>
+        Cuisine : <input type="text" required v-model="cuisine" name="CuisMod">
+    </label>
+
+    <button>Modifier</button>
+</form>
+
+</div>
+</body>
+
+</html>
