@@ -28,7 +28,8 @@ function init() {
             //pagesize:10,
             page:0,
             nbRestaurantsParPage: 5,
-            nomRecherche:''
+            nomRecherche:'',
+            id:''
         },
         
         mounted() {
@@ -38,18 +39,10 @@ function init() {
         methods: {
             getRestaurantsFromServer() {
                 let url = "http://localhost:8080/api/restaurants?page=" +
-                    this.page  +  "&pagesize=" + //this.pagesize;
-                    this.nbRestaurantsParPage+  "&name=" + this.nomRecherche;
+                    this.page  +"&name=" + this.nomRecherche +   "&pagesize=" + //this.pagesize;
+                    this.nbRestaurantsParPage;
 
-                    //gestion des disabled pour les boutons de pagination
-if (this.page==0){
-    document.getElementById("PremPage").disabled='true';
-    document.getElementById("PagePrec").disabled='true';
-}
-    else {
-        document.getElementById("PremPage").disabled='';
-    document.getElementById("PagePrec").disabled='';
-    }
+                  
 
                 console.log("Je vais chercher les restaurants sur : " + url)
 
@@ -69,6 +62,28 @@ if (this.page==0){
                     .catch((err) => {
                         console.log("Une erreur est intervenue " + err);
                     });
+
+                      //gestion des disabled pour les boutons de pagination
+
+                    if (this.page==0){
+                        document.getElementById("PremPage").disabled='true';
+                        document.getElementById("PagePrec").disabled='true';
+                    }
+                        else {
+                            document.getElementById("PremPage").disabled='';
+                        document.getElementById("PagePrec").disabled='';
+                        }
+                    
+                        // lorsqu'on lance la page, ces boutons sont désactivés, et se réactive dès que l'on effectue une recherche 
+                        //==> temps d'exécution trop long? je suppose que c'est parce que nbRestaurants =0 au début
+                      if ((Math.trunc(this.nbRestaurants/this.nbRestaurantsParPage))<=this.page){
+                            document.getElementById("PageSuiv").disabled='true';
+                            document.getElementById("DernPage").disabled='true';
+                        }
+                            else {
+                                document.getElementById("PageSuiv").disabled='';
+                            document.getElementById("DernPage").disabled='';
+                            }
             },
 
             searchRestaurantsFromServer: _.debounce(
@@ -79,8 +94,8 @@ if (this.page==0){
 
 
 
-    supprimerRestaurant(_id) {
-                //this.restaurants.splice(index, 1);
+    supprimerRestaurant(id, index) {
+           
             
  
 
@@ -88,26 +103,28 @@ if (this.page==0){
     // ou document.getElementById puisque c'est le formulaire qui a généré
     // l'événement
     
- 
-   // let id = form._id.value // on peut aller chercher la valeur
+   // on peut aller chercher la valeur
                              // d'un champs d'un formulaire
                              // comme cela, si on connait le nom
                              // du champ (valeur de son attribut name)
-                             let url = "http://localhost:8080/api/restaurants/" + _id;
+                            this.restaurants.splice(index, 1);
+                             let url = "http://localhost:8080/api/restaurants/" + id;
 
                              fetch(url, {
-                                 method: "DELETE",
+                                 method: "DELETE"
                              })
                              .then(function(responseJSON) {
                                  responseJSON.json()
                                      .then(function(res) {
                                          // Maintenant res est un vrai objet JavaScript
                                          console.log("Restaurant supprimé");
+                                          this.getRestaurantsFromServer();
                                      });
                                  })
                                  .catch(function (err) {
                                      console.log(err);
                              });
+                            
                          },
 
 
@@ -152,21 +169,29 @@ if (this.page==0){
                         console.log(err);
                     });
         },
-      modifierRestaurant(_id) {
+      modifierRestaurant(event) {
 
-
-
-   // let id = form._id.value; // on peut aller chercher la valeur
-                             // d'un champs d'un formulaire
-                             // comme cela, si on connait le nom
-                             // du champ (valeur de son attribut name)
-
-    let url = "http://localhost:8080/api/restaurants/" + _id;
-
-    fetch(url, {
-        method: "PUT",
-        body: donneesFormulaire
-    })
+        event.preventDefault();
+        document.getElementsByClassName("Mod").style.display = "none";
+        // Récupération du formulaire. Pas besoin de document.querySelector
+        // ou document.getElementById puisque c'est le formulaire qui a généré
+        // l'événement
+        let form = event.target;
+        // Récupération des valeurs des champs du formulaire
+        // en prévision d'un envoi multipart en ajax/fetch
+        let donneesFormulaire = new FormData(event.target);
+    
+        let id = form._id.value; // on peut aller chercher la valeur
+                                 // d'un champs d'un formulaire
+                                 // comme cela, si on connait le nom
+                                 // du champ (valeur de son attribut name)
+    
+        let url = "/api/restaurants/" + id;
+    
+        fetch(url, {
+            method: "PUT",
+            body: donneesFormulaire
+        })
     .then(function(responseJSON) {
         responseJSON.json()
             .then(function(res) {
@@ -192,19 +217,29 @@ if (this.page==0){
                 }
             },
            dernierePage(){
-                this.page++;
+            if ((Math.trunc(this.nbRestaurants/this.nbRestaurantsParPage))>this.page)
+            {
+                this.page=Math.trunc(this.nbRestaurants/this.nbRestaurantsParPage);
                 this.getRestaurantsFromServer();
+            }
             },
             pageSuivante() {
-
-                
+                if ((Math.trunc(this.nbRestaurants/this.nbRestaurantsParPage))>this.page)
+                {
                 this.page++;
                 this.getRestaurantsFromServer();
+                }
             
             },
             changePageSize() {
                 this.getRestaurantsFromServer();
             },
+
+       /*     preModifier(nom,cuis){
+            document.getElementsByClassName("Mod").style.display = "block";
+            document.getElementsByName("NomMod").value=nom;
+            document.getElementsByName("CuisMod").value=cuis;
+            },*/
 getColor(index) {
     return (index % 2) ? 'lightBlue' : 'pink';
 }

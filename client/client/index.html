@@ -61,13 +61,13 @@
             <th>Cuisine </th>
         </tr>
         <tbody>
-            <tr id="dataTable" v-for="r,index in restaurants" v-onclick="supprimerRestaurant(r._id)" v-bind:style="{backgroundColor:getColor(index)}"
+            <tr id="dataTable" v-for="r,index in restaurants" v-on:click="supprimerRestaurant(r._id,index)" v-bind:style="{backgroundColor:getColor(index)}"
                 v-bind:class="{bordureRouge:(index === 2)}">
-                <td style="display:none;">{{r.id}}</td>
+                
                 <td>{{r.name}}</td>
                 <td> {{r.cuisine}}</td>
-                <td><button v-on:click="modifierRestaurant(r._id)">Modifier</button></td>
-                <!--<td><button v-on:click="PreModifier(r.id)">Modifier</button></td>>-->
+               
+             
             </tr>
         </tbody>
     </table>
@@ -77,12 +77,10 @@
     <input type="button" id="PageSuiv" v-on:click="pageSuivante" value="Page suivante"></input>
     <input type="button" id="DernPage" v-on:click="dernierePage" value="Dernière page"></input>
 
-  <!-- <form v-on:submit="modifierRestaurant" class="Mod">
+   <form v-on:submit="modifierRestaurant" class="Mod">
         <p class="AddTxt">   Modifier un restaurant : </p>
     <br/>
-    <label style="display:none;">
-        ID : <input type="text" required v-model="id" name="_id">
-    </label>
+
    <label>
         Nom : <input type="text" required v-model="name" name="NomMod">
     </label>
@@ -92,7 +90,7 @@
 
     <button>Modifier</button>
 </form>
---> 
+
 </div>
 </body>
 
